@@ -1,0 +1,87 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+// --- CONFIGURATIONS ---
+
+configurations {
+    runtime
+    ecj
+}
+
+configurations.all {
+    // resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+// --- REPOSITORIES ---
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+// --- DEPENDENCIES ---
+
+dependencies {
+
+    // ============== COMPILATION =============
+    
+    testCompile 'junit:junit:4.12'
+	ecj 'org.eclipse.jdt.core.compiler:ecj:4.4.2'
+
+	// =============== LOGGING ===============
+	
+	// http://mvnrepository.com/artifact/org.slf4j/slf4j-api
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
+       
+	// http://mvnrepository.com/artifact/org.slf4j/slf4j-jdk14
+	compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.28'
+
+	// https://mvnrepository.com/artifact/org.slf4j/log4j-over-slf4j
+	compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.28'
+
+	// https://mvnrepository.com/artifact/org.slf4j/jcl-over-slf4j
+	compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.28'
+	
+    // =============== MOLECULER ===============
+
+	// Moleculer core
+	compile group: 'com.github.berkesa', name: 'moleculer-java', version: '1.2.0-SNAPSHOT', changing: true
+
+	// =========== SPRING FRAMEWORK ============
+
+	// https://mvnrepository.com/artifact/org.springframework/spring-context
+	compile group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
+
+	// ============ GUAVA EVENT BUS ============
+
+	// https://mvnrepository.com/artifact/com.google.guava/guava
+	compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+	
+	// ============ VERTX EVENT BUS ============
+		
+	// https://mvnrepository.com/artifact/io.vertx/vertx-core
+	compile group: 'io.vertx', name: 'vertx-core', version: '3.8.2'
+
+	// ============= AKKA EVENT BUS ============
+	
+	// https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor
+	compile group: 'com.typesafe.akka', name: 'akka-actor_2.12', version: '2.5.25'
+
+}
+
+// --- COMPILATION ---
+
+compileJava {
+	options.fork = true
+	options.forkOptions.with {
+		executable = 'java'
+		jvmArgs = ['-classpath', project.configurations.ecj.asPath, 'org.eclipse.jdt.internal.compiler.batch.Main', '-nowarn']
+	}
+}
+
+// --- TESTING ---
+
+test {
+	systemProperty 'java.util.logging.SimpleFormatter.format', '%4$-7s %5$s %n'
+}
