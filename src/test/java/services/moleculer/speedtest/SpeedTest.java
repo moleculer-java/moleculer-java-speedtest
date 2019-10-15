@@ -148,7 +148,7 @@ public class SpeedTest extends TestCase {
 		doAkkaTest(WARM_UP_LOOPS, checksumWarmUp);
 	}
 
-	// --- DO TEST ---
+	// --- DO TESTS ---
 
 	@Test
 	public void testSpeed() throws Exception {
@@ -178,6 +178,8 @@ public class SpeedTest extends TestCase {
 		System.out.println("Akka EventBus: " + duration + " msec / " + TEST_LOOPS + " events");		
 	}
 
+	// --- SPEED TEST OF MOLECULER (SYNC) ---
+	
 	protected long doMoleculerTest(int loops, long checksum) throws Exception {
 		moleculerService.counter.set(0);
 
@@ -190,6 +192,8 @@ public class SpeedTest extends TestCase {
 		return duration;
 	}
 
+	// --- SPEED TEST OF MOLECULER (ASYNC) ---
+	
 	protected long doMoleculerTestAsync(int loops, long checksum) throws Exception {
 		moleculerServiceAsync.counter.set(0);
 		moleculerServiceAsync.future = new CompletableFuture<Void>();
@@ -206,6 +210,8 @@ public class SpeedTest extends TestCase {
 		return duration;
 	}
 	
+	// --- SPEED TEST OF SPRING ---
+	
 	protected long doSpringTest(int loops, long checksum) throws Exception {
 		springListener.counter.set(0);
 
@@ -218,6 +224,8 @@ public class SpeedTest extends TestCase {
 		return duration;
 	}
 
+	// --- SPEED TEST OF GUAVA ---
+	
 	protected long doGuavaTest(int loops, long checksum) throws Exception {
 		guavaListener.counter.set(0);
 
@@ -230,6 +238,8 @@ public class SpeedTest extends TestCase {
 		return duration;
 	}
 
+	// --- SPEED TEST OF VERTX ---
+	
 	protected long doVertxTest(int loops, long checksum) throws Exception {
 		vertxListener.counter.set(0);
 		io.vertx.core.eventbus.EventBus eventBus = vertx.eventBus();
@@ -251,6 +261,8 @@ public class SpeedTest extends TestCase {
 		return duration;
 	}
 
+	// --- SPEED TEST OF AKKA ---
+	
 	protected long doAkkaTest(int loops, long checksum) throws Exception {
 		ActorRef sender = ActorRef.noSender();
 		akkaPromise = new CompletableFuture<Long>();
@@ -277,6 +289,9 @@ public class SpeedTest extends TestCase {
 		if (moleculerBroker != null) {
 			moleculerBroker.stop();
 		}
+		if (moleculerBrokerAsync != null) {
+			moleculerBrokerAsync.stop();
+		}
 		if (springContext != null) {
 			springContext.close();
 		}
@@ -288,7 +303,7 @@ public class SpeedTest extends TestCase {
 		}
 	}
 
-	// --- LISTENER CLASSES ---
+	// --- LISTENER AND MESSAGE CLASSES ---
 
 	protected static class TestMoleculerService extends Service {
 
