@@ -61,7 +61,7 @@ public class SpeedTest extends TestCase {
 
 	public static final int WARM_UP_LOOPS = 100;
 
-	public static final int TEST_LOOPS = 100000;
+	public static final int TEST_LOOPS = 1000000;
 
 	// --- EVENT BUSES AND LISTENERS ---
 
