@@ -171,7 +171,7 @@ public class SpeedTest extends TestCase {
 	public void testSpeed() throws Exception {
 		String[][] results = new String[6][];
 		StringBuilder report = new StringBuilder(1024);
-		report.append("**Test results:**\r\n```\r\n");
+		report.append("**Internal EventBus tests:**\r\n```\r\n");
 		
 		// Do Moleculer Service Broker test (sync)
 		long duration = doMoleculerTest(TEST_LOOPS, checksumTest);

@@ -1,7 +1,7 @@
 # [WIP] moleculer-java-speedtest
 Measure the speed of EventBus for different implementations (Moleculer vs Guava/Akka/Vert.x/Spring).  
 
-**Test results:**
+**Internal EventBus tests:**
 ```
 Moleculer Sync   (direct method call):   10 000 000 requests made within 1 287 milliseconds.  
 Moleculer Async  (call via thread pool): 10 000 000 requests made within 3 257 milliseconds.  
