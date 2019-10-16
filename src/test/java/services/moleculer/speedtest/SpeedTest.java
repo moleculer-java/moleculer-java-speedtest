@@ -25,6 +25,12 @@
  */
 package services.moleculer.speedtest;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -59,9 +65,9 @@ public class SpeedTest extends TestCase {
 
 	// --- TEST PARAMETERS ---
 
-	public static final int WARM_UP_LOOPS = 100;
+	public static final int WARM_UP_LOOPS = 1000;
 
-	public static final int TEST_LOOPS = 1000000;
+	public static final int TEST_LOOPS = 10000000;
 
 	// --- EVENT BUSES AND LISTENERS ---
 
@@ -85,12 +91,22 @@ public class SpeedTest extends TestCase {
 	protected static CompletableFuture<Long> akkaPromise;
 	protected static long akkaLimit;
 	protected static AtomicLong akkaCounter;
-	
+
 	// --- VERIFICATION ---
 
 	protected long checksumWarmUp;
 	protected long checksumTest;
 
+	// --- NUMBER FORMATTER ---
+	
+	protected static final DecimalFormat formatter = new DecimalFormat("#,##0");
+
+	static {
+		DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
+		decimalFormatSymbols.setGroupingSeparator(' ');
+		formatter.setDecimalFormatSymbols(decimalFormatSymbols);
+	}
+	
 	// --- INIT ---
 
 	@Override
@@ -112,7 +128,8 @@ public class SpeedTest extends TestCase {
 
 		DefaultEventbus deb = new DefaultEventbus();
 		deb.setAsyncLocalInvocation(true);
-		moleculerBrokerAsync = ServiceBroker.builder().monitor(new ConstantMonitor()).eventbus(deb).internalServices(false).build();
+		moleculerBrokerAsync = ServiceBroker.builder().monitor(new ConstantMonitor()).eventbus(deb)
+				.internalServices(false).build();
 		moleculerServiceAsync = new TestMoleculerServiceAsync();
 		moleculerBrokerAsync.createService(moleculerServiceAsync);
 		moleculerBrokerAsync.start();
@@ -152,34 +169,92 @@ public class SpeedTest extends TestCase {
 
 	@Test
 	public void testSpeed() throws Exception {
-
+		String[][] results = new String[6][];
+		StringBuilder report = new StringBuilder(1024);
+		report.append("**Test results:**\r\n```\r\n");
+		
 		// Do Moleculer Service Broker test (sync)
 		long duration = doMoleculerTest(TEST_LOOPS, checksumTest);
-		System.out.println("Moleculer Sync: " + duration + " msec / " + TEST_LOOPS + " events");
+		results[0] = getResult("Moleculer Sync", true, duration, report);
 
 		// Do Moleculer Service Broker test (async)
 		duration = doMoleculerTestAsync(TEST_LOOPS, checksumTest);
-		System.out.println("Moleculer Async: " + duration + " msec / " + TEST_LOOPS + " events");
+		results[1] = getResult("Moleculer Async", false, duration, report);
 
 		// Do Moleculer Service Broker test
 		duration = doSpringTest(TEST_LOOPS, checksumTest);
-		System.out.println("Spring EventBus: " + duration + " msec / " + TEST_LOOPS + " events");
+		results[2] = getResult("Spring EventBus", true, duration, report);
 
 		// Do Google Guava EventBus test
 		duration = doGuavaTest(TEST_LOOPS, checksumTest);
-		System.out.println("Guava EventBus: " + duration + " msec / " + TEST_LOOPS + " events");
+		results[3] = getResult("Google Guava", true, duration, report);
 
 		// Do Vert.x EventBus test
 		duration = doVertxTest(TEST_LOOPS, checksumTest);
-		System.out.println("Vert.x EventBus: " + duration + " msec / " + TEST_LOOPS + " events");
-		
+		results[4] = getResult("Vert.x EventBus", false, duration, report);
+
 		// Do Akka test
 		duration = doAkkaTest(TEST_LOOPS, checksumTest);
-		System.out.println("Akka EventBus: " + duration + " msec / " + TEST_LOOPS + " events");		
+		results[5] = getResult("Akka ActorSystem", false, duration, report);
+
+		// Sort results
+		Arrays.sort(results, (r1, r2) -> {
+			return Long.compare(Long.parseLong(r2[2].replace(" ", "")), Long.parseLong(r1[2].replace(" ", "")));
+		});
+		
+		// Print table
+		report.append("```\r\n**Organized results:**\r\n\r\n");
+		report.append("| Framework        | Type  | Events/sec |\r\n");
+		report.append("| ---------------- | ----- | ---------- |\r\n");
+		for (String[] result: results) {
+			report.append("| ");
+			report.append(result[0]);
+			report.append(" | ");
+			report.append(result[1]);
+			report.append(" | ");
+			report.append(result[2]);
+			report.append("  |\r\n");
+		}
+		report.append("\r\n*The higher value is better - the fastest are \"");
+		report.append(results[0][0].trim());
+		report.append("\" then \"");
+		report.append(results[1][0].trim());
+		report.append("\".  \r\nThe best result is ");
+		report.append(results[0][2].trim());
+		report.append(" messages per second.*\r\n");
+		
+		report.append("\r\nWarm up cycles: ");
+		report.append(formatter.format(WARM_UP_LOOPS));
+		report.append("  \r\nTest cycles:    ");
+		report.append(formatter.format(TEST_LOOPS));
+		System.out.println(report);
+	}
+
+	protected String[] getResult(String frameworkName, boolean sync, long durationMillis, StringBuilder report) {
+		BigDecimal oneSecond = new BigDecimal(1000);
+		BigDecimal duration = new BigDecimal(durationMillis);
+		BigDecimal loops = new BigDecimal(TEST_LOOPS);
+		BigDecimal eventsPerSecond = oneSecond.divide(duration, 10, RoundingMode.HALF_EVEN).multiply(loops,
+				MathContext.DECIMAL128);
+		String formatted = formatter.format(eventsPerSecond);
+		while (formatted.length() < 9) {
+			formatted += ' ';
+		}		
+		while (frameworkName.length() < 16) {
+			frameworkName += ' ';
+		}
+		report.append(frameworkName);
+		report.append(" (");
+		report.append(sync ? "direct method call):   " : "call via thread pool): ");
+		report.append(formatter.format(TEST_LOOPS));
+		report.append(" requests made within ");
+		report.append(formatter.format(durationMillis));
+		report.append(" milliseconds.  \r\n");
+		return new String[] { frameworkName, sync ? "Sync " : "Async", formatted };
 	}
 
 	// --- SPEED TEST OF MOLECULER (SYNC) ---
-	
+
 	protected long doMoleculerTest(int loops, long checksum) throws Exception {
 		moleculerService.counter.set(0);
 
@@ -193,12 +268,12 @@ public class SpeedTest extends TestCase {
 	}
 
 	// --- SPEED TEST OF MOLECULER (ASYNC) ---
-	
+
 	protected long doMoleculerTestAsync(int loops, long checksum) throws Exception {
 		moleculerServiceAsync.counter.set(0);
 		moleculerServiceAsync.future = new CompletableFuture<Void>();
 		moleculerServiceAsync.limit = checksum;
-		
+
 		// Asynchronous transport
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < loops; i++) {
@@ -209,9 +284,9 @@ public class SpeedTest extends TestCase {
 		assertEquals(checksum, moleculerServiceAsync.counter.get());
 		return duration;
 	}
-	
+
 	// --- SPEED TEST OF SPRING ---
-	
+
 	protected long doSpringTest(int loops, long checksum) throws Exception {
 		springListener.counter.set(0);
 
@@ -225,7 +300,7 @@ public class SpeedTest extends TestCase {
 	}
 
 	// --- SPEED TEST OF GUAVA ---
-	
+
 	protected long doGuavaTest(int loops, long checksum) throws Exception {
 		guavaListener.counter.set(0);
 
@@ -239,7 +314,7 @@ public class SpeedTest extends TestCase {
 	}
 
 	// --- SPEED TEST OF VERTX ---
-	
+
 	protected long doVertxTest(int loops, long checksum) throws Exception {
 		vertxListener.counter.set(0);
 		io.vertx.core.eventbus.EventBus eventBus = vertx.eventBus();
@@ -262,14 +337,14 @@ public class SpeedTest extends TestCase {
 	}
 
 	// --- SPEED TEST OF AKKA ---
-	
+
 	protected long doAkkaTest(int loops, long checksum) throws Exception {
 		ActorRef sender = ActorRef.noSender();
 		akkaPromise = new CompletableFuture<Long>();
 		akkaLimit = checksum;
 		akkaCounter = new AtomicLong();
 		long result;
-		
+
 		// Akka is asynchronous
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < loops; i++) {
@@ -281,7 +356,7 @@ public class SpeedTest extends TestCase {
 		assertEquals(checksum, result);
 		return duration;
 	}
-	
+
 	// --- TEAR DOWN ---
 
 	@Override
@@ -321,16 +396,17 @@ public class SpeedTest extends TestCase {
 		AtomicLong counter = new AtomicLong();
 		CompletableFuture<Void> future;
 		long limit;
-		
+
 		@services.moleculer.eventbus.Subscribe("test.event")
 		public Listener evt = ctx -> {
 			if (counter.addAndGet(ctx.params.asInteger()) >= limit) {
 				future.complete(null);
-			};
+			}
+			;
 		};
 
 	}
-	
+
 	protected static class TestSpringEvent extends ApplicationEvent {
 
 		private static final long serialVersionUID = 1L;
