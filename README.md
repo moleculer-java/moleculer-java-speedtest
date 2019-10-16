@@ -1,5 +1,5 @@
 # [WIP] moleculer-java-speedtest
-Measure the speed of EventBus for different implementations (Moleculer vs Guava/Akka/Vert.x/Spring).
+Measure the speed of EventBus for different implementations (Moleculer vs Guava/Akka/Vert.x/Spring).  
 
 **Test results:**
 ```
@@ -26,3 +26,5 @@ The best result is 7 770 008 messages per second.*
 
 Warm up cycles: 1 000  
 Test cycles:    10 000 000
+
+[[source of the test]](https://github.com/moleculer-java/moleculer-java-speedtest/blob/master/src/test/java/services/moleculer/speedtest/SpeedTest.java)
