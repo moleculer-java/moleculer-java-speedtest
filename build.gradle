@@ -46,7 +46,7 @@ dependencies {
     // =============== MOLECULER ===============
 
 	// Moleculer core
-	compile group: 'com.github.berkesa', name: 'moleculer-java', version: '1.2.0'
+	compile group: 'com.github.berkesa', name: 'moleculer-java-web', version: '1.2.3'
 
 	// =========== SPRING FRAMEWORK ============
 
@@ -68,6 +68,22 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor
 	compile group: 'com.typesafe.akka', name: 'akka-actor_2.12', version: '2.5.25'
 
+	// =========== SPRING BOOT WEB ============
+	
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+	compile (group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.2.1.RELEASE') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+		exclude group: 'org.springframework', module: 'spring-jcl'
+	}	
+
+	// ========== ASYNC HTTP CLIENT ============
+	
+	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient
+	compile group: 'org.apache.httpcomponents', name: 'httpasyncclient', version: '4.1.4'
+
+	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime
+	compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.10'
+	
 }
 
 // --- COMPILATION ---

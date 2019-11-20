@@ -61,7 +61,7 @@ import services.moleculer.monitor.ConstantMonitor;
 import services.moleculer.service.Service;
 import services.moleculer.util.CheckedTree;
 
-public class SpeedTest extends TestCase {
+public class EventBusTest extends TestCase {
 
 	// --- TEST PARAMETERS ---
 
