@@ -46,7 +46,7 @@ dependencies {
     // =============== MOLECULER ===============
 
 	// Moleculer core
-	compile group: 'com.github.berkesa', name: 'moleculer-java-web', version: '1.2.3'
+	compile group: 'com.github.berkesa', name: 'moleculer-java-web', version: '1.2.4'
 
 	// =========== SPRING FRAMEWORK ============
 

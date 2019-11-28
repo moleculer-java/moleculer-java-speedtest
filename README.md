@@ -3,26 +3,26 @@ Measure the speed of EventBus for different implementations (Moleculer vs Guava/
 
 **Internal EventBus tests:**
 ```
-Moleculer Sync   (direct method call):   10 000 000 requests made within 1 287 milliseconds.  
-Moleculer Async  (call via thread pool): 10 000 000 requests made within 3 257 milliseconds.  
-Spring EventBus  (direct method call):   10 000 000 requests made within 1 408 milliseconds.  
-Google Guava     (direct method call):   10 000 000 requests made within 2 123 milliseconds.  
-Vert.x EventBus  (call via thread pool): 10 000 000 requests made within 6 705 milliseconds.  
-Akka ActorSystem (call via thread pool): 10 000 000 requests made within 2 260 milliseconds.  
+Moleculer Sync   (direct method call):   10 000 000 requests made within 998 milliseconds.  
+Moleculer Async  (call via thread pool): 10 000 000 requests made within 3 296 milliseconds.  
+Spring EventBus  (direct method call):   10 000 000 requests made within 1 125 milliseconds.  
+Google Guava     (direct method call):   10 000 000 requests made within 1 903 milliseconds.  
+Vert.x EventBus  (call via thread pool): 10 000 000 requests made within 10 004 milliseconds.  
+Akka ActorSystem (call via thread pool): 10 000 000 requests made within 2 391 milliseconds.  
 ```
 **Organized results:**
 
 | Framework        | Type  | Events/sec |
 | ---------------- | ----- | ---------- |
-| Moleculer Sync   | Sync  | 7 770 008  |
-| Spring EventBus  | Sync  | 7 102 273  |
-| Google Guava     | Sync  | 4 710 316  |
-| Akka ActorSystem | Async | 4 424 779  |
-| Moleculer Async  | Async | 3 070 310  |
-| Vert.x EventBus  | Async | 1 491 424  |
+| Moleculer Sync   | Sync  | 10 020 040 |
+| Spring EventBus  | Sync  | 8 888 889  |
+| Google Guava     | Sync  | 5 254 861  |
+| Akka ActorSystem | Async | 4 182 350  |
+| Moleculer Async  | Async | 3 033 981  |
+| Vert.x EventBus  | Async | 999 600    |
 
 *The higher value is better - the fastest are "Moleculer Sync" then "Spring EventBus".  
-The best result is 7 770 008 messages per second.*
+The best result is 10 020 040 messages per second.*
 
 Warm up cycles: 1 000  
 Test cycles:    10 000 000

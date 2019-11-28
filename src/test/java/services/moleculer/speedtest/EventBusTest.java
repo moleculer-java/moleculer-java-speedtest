@@ -213,7 +213,7 @@ public class EventBusTest extends TestCase {
 			report.append(result[1]);
 			report.append(" | ");
 			report.append(result[2]);
-			report.append("  |\r\n");
+			report.append(" |\r\n");
 		}
 		report.append("\r\n*The higher value is better - the fastest are \"");
 		report.append(results[0][0].trim());
@@ -237,7 +237,7 @@ public class EventBusTest extends TestCase {
 		BigDecimal eventsPerSecond = oneSecond.divide(duration, 10, RoundingMode.HALF_EVEN).multiply(loops,
 				MathContext.DECIMAL128);
 		String formatted = formatter.format(eventsPerSecond);
-		while (formatted.length() < 9) {
+		while (formatted.length() < 10) {
 			formatted += ' ';
 		}		
 		while (frameworkName.length() < 16) {
