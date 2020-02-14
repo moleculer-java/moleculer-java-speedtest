@@ -1,4 +1,5 @@
-# [WIP] moleculer-java-speedtest
+## (WIP) Moleculer for Java speedtest
+
 Measure the speed of EventBus for different implementations (Moleculer vs Guava/Akka/Vert.x/Spring).  
 
 **Internal EventBus tests:**
@@ -28,3 +29,7 @@ Warm up cycles: 1 000
 Test cycles:    10 000 000
 
 [[source of the test]](https://github.com/moleculer-java/moleculer-java-speedtest/blob/master/src/test/java/services/moleculer/speedtest/SpeedTest.java)
+
+## Moleculer Documentation
+
+[![Documentation](https://raw.githubusercontent.com/moleculer-java/site/master/docs/docs-button.png)](https://moleculer-java.github.io/site/introduction.html)
