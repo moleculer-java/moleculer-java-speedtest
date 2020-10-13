@@ -32,46 +32,46 @@ dependencies {
 	// =============== LOGGING ===============
 	
 	// http://mvnrepository.com/artifact/org.slf4j/slf4j-api
-	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
        
 	// http://mvnrepository.com/artifact/org.slf4j/slf4j-jdk14
-	compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.28'
+	compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.30'
 
 	// https://mvnrepository.com/artifact/org.slf4j/log4j-over-slf4j
-	compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.28'
+	compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.30'
 
 	// https://mvnrepository.com/artifact/org.slf4j/jcl-over-slf4j
-	compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.28'
+	compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.30'
 	
     // =============== MOLECULER ===============
 
 	// Moleculer core
-	compile group: 'com.github.berkesa', name: 'moleculer-java-web', version: '1.2.4'
+	compile group: 'com.github.berkesa', name: 'moleculer-java-web', version: '1.2.11'
 
 	// =========== SPRING FRAMEWORK ============
 
 	// https://mvnrepository.com/artifact/org.springframework/spring-context
-	compile group: 'org.springframework', name: 'spring-context', version: '5.2.0.RELEASE'
+	compile group: 'org.springframework', name: 'spring-context', version: '5.2.9.RELEASE'
 
 	// ============ GUAVA EVENT BUS ============
 
 	// https://mvnrepository.com/artifact/com.google.guava/guava
-	compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+	compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
 	
 	// ============ VERTX EVENT BUS ============
 		
 	// https://mvnrepository.com/artifact/io.vertx/vertx-core
-	compile group: 'io.vertx', name: 'vertx-core', version: '3.8.2'
+	compile group: 'io.vertx', name: 'vertx-core', version: '3.9.3'
 
 	// ============= AKKA EVENT BUS ============
 	
 	// https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor
-	compile group: 'com.typesafe.akka', name: 'akka-actor_2.12', version: '2.5.25'
+	compile group: 'com.typesafe.akka', name: 'akka-actor_2.12', version: '2.6.10'
 
 	// =========== SPRING BOOT WEB ============
 	
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-	compile (group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.2.1.RELEASE') {
+	compile (group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.3.4.RELEASE') {
 		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 		exclude group: 'org.springframework', module: 'spring-jcl'
 	}	
@@ -82,7 +82,7 @@ dependencies {
 	compile group: 'org.apache.httpcomponents', name: 'httpasyncclient', version: '4.1.4'
 
 	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime
-	compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.10'
+	compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.13'
 	
 }
 

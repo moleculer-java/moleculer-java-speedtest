@@ -4,26 +4,24 @@ Measure the speed of EventBus for different implementations (Moleculer vs Guava/
 
 **Internal EventBus tests:**
 ```
-Moleculer Sync   (direct method call):   10 000 000 requests made within 998 milliseconds.  
-Moleculer Async  (call via thread pool): 10 000 000 requests made within 3 296 milliseconds.  
-Spring EventBus  (direct method call):   10 000 000 requests made within 1 125 milliseconds.  
-Google Guava     (direct method call):   10 000 000 requests made within 1 903 milliseconds.  
-Vert.x EventBus  (call via thread pool): 10 000 000 requests made within 10 004 milliseconds.  
-Akka ActorSystem (call via thread pool): 10 000 000 requests made within 2 391 milliseconds.  
+Moleculer        (direct method call):   10 000 000 requests made within 942 milliseconds.  
+Spring EventBus  (direct method call):   10 000 000 requests made within 1 156 milliseconds.  
+Google Guava     (direct method call):   10 000 000 requests made within 1 864 milliseconds.  
+Vert.x EventBus  (call via thread pool): 10 000 000 requests made within 8 100 milliseconds.  
+Akka ActorSystem (call via thread pool): 10 000 000 requests made within 5 573 milliseconds.  
 ```
 **Organized results:**
 
 | Framework        | Type  | Events/sec |
 | ---------------- | ----- | ---------- |
-| Moleculer Sync   | Sync  | 10 020 040 |
-| Spring EventBus  | Sync  | 8 888 889  |
-| Google Guava     | Sync  | 5 254 861  |
-| Akka ActorSystem | Async | 4 182 350  |
-| Moleculer Async  | Async | 3 033 981  |
-| Vert.x EventBus  | Async | 999 600    |
+| Moleculer        | Sync  | 10 615 711 |
+| Spring EventBus  | Sync  | 8 650 519  |
+| Google Guava     | Sync  | 5 364 807  |
+| Akka ActorSystem | Async | 1 794 366  |
+| Vert.x EventBus  | Async | 1 234 568  |
 
-*The higher value is better - the fastest are "Moleculer Sync" then "Spring EventBus".  
-The best result is 10 020 040 messages per second.*
+*The higher value is better - the fastest are "Moleculer" then "Spring EventBus".  
+The best result is 10 615 711 messages per second.*
 
 Warm up cycles: 1 000  
 Test cycles:    10 000 000

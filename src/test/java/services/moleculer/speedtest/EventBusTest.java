@@ -55,7 +55,6 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageCodec;
 import junit.framework.TestCase;
 import services.moleculer.ServiceBroker;
-import services.moleculer.eventbus.DefaultEventbus;
 import services.moleculer.eventbus.Listener;
 import services.moleculer.monitor.ConstantMonitor;
 import services.moleculer.service.Service;
@@ -73,9 +72,6 @@ public class EventBusTest extends TestCase {
 
 	protected ServiceBroker moleculerBroker;
 	protected TestMoleculerService moleculerService;
-
-	protected ServiceBroker moleculerBrokerAsync;
-	protected TestMoleculerServiceAsync moleculerServiceAsync;
 
 	protected AnnotationConfigApplicationContext springContext;
 	protected TestSpringEventListener springListener;
@@ -98,7 +94,7 @@ public class EventBusTest extends TestCase {
 	protected long checksumTest;
 
 	// --- NUMBER FORMATTER ---
-	
+
 	protected static final DecimalFormat formatter = new DecimalFormat("#,##0");
 
 	static {
@@ -106,7 +102,7 @@ public class EventBusTest extends TestCase {
 		decimalFormatSymbols.setGroupingSeparator(' ');
 		formatter.setDecimalFormatSymbols(decimalFormatSymbols);
 	}
-	
+
 	// --- INIT ---
 
 	@Override
@@ -125,14 +121,6 @@ public class EventBusTest extends TestCase {
 		moleculerService = new TestMoleculerService();
 		moleculerBroker.createService(moleculerService);
 		moleculerBroker.start();
-
-		DefaultEventbus deb = new DefaultEventbus();
-		deb.setAsyncLocalInvocation(true);
-		moleculerBrokerAsync = ServiceBroker.builder().monitor(new ConstantMonitor()).eventbus(deb)
-				.internalServices(false).build();
-		moleculerServiceAsync = new TestMoleculerServiceAsync();
-		moleculerBrokerAsync.createService(moleculerServiceAsync);
-		moleculerBrokerAsync.start();
 
 		// Create Spring Context
 		springContext = new AnnotationConfigApplicationContext(TestSpringConfig.class);
@@ -158,7 +146,6 @@ public class EventBusTest extends TestCase {
 
 		// Warm up
 		doMoleculerTest(WARM_UP_LOOPS, checksumWarmUp);
-		doMoleculerTestAsync(WARM_UP_LOOPS, checksumWarmUp);
 		doSpringTest(WARM_UP_LOOPS, checksumWarmUp);
 		doGuavaTest(WARM_UP_LOOPS, checksumWarmUp);
 		doVertxTest(WARM_UP_LOOPS, checksumWarmUp);
@@ -169,44 +156,40 @@ public class EventBusTest extends TestCase {
 
 	@Test
 	public void testSpeed() throws Exception {
-		String[][] results = new String[6][];
+		String[][] results = new String[5][];
 		StringBuilder report = new StringBuilder(1024);
 		report.append("**Internal EventBus tests:**\r\n```\r\n");
-		
-		// Do Moleculer Service Broker test (sync)
-		long duration = doMoleculerTest(TEST_LOOPS, checksumTest);
-		results[0] = getResult("Moleculer Sync", true, duration, report);
-
-		// Do Moleculer Service Broker test (async)
-		duration = doMoleculerTestAsync(TEST_LOOPS, checksumTest);
-		results[1] = getResult("Moleculer Async", false, duration, report);
 
 		// Do Moleculer Service Broker test
+		long duration = doMoleculerTest(TEST_LOOPS, checksumTest);
+		results[0] = getResult("Moleculer", true, duration, report);
+
+		// Do Spring EventBus test
 		duration = doSpringTest(TEST_LOOPS, checksumTest);
-		results[2] = getResult("Spring EventBus", true, duration, report);
+		results[1] = getResult("Spring EventBus", true, duration, report);
 
 		// Do Google Guava EventBus test
 		duration = doGuavaTest(TEST_LOOPS, checksumTest);
-		results[3] = getResult("Google Guava", true, duration, report);
+		results[2] = getResult("Google Guava", true, duration, report);
 
 		// Do Vert.x EventBus test
 		duration = doVertxTest(TEST_LOOPS, checksumTest);
-		results[4] = getResult("Vert.x EventBus", false, duration, report);
+		results[3] = getResult("Vert.x EventBus", false, duration, report);
 
 		// Do Akka test
 		duration = doAkkaTest(TEST_LOOPS, checksumTest);
-		results[5] = getResult("Akka ActorSystem", false, duration, report);
+		results[4] = getResult("Akka ActorSystem", false, duration, report);
 
 		// Sort results
 		Arrays.sort(results, (r1, r2) -> {
 			return Long.compare(Long.parseLong(r2[2].replace(" ", "")), Long.parseLong(r1[2].replace(" ", "")));
 		});
-		
+
 		// Print table
 		report.append("```\r\n**Organized results:**\r\n\r\n");
 		report.append("| Framework        | Type  | Events/sec |\r\n");
 		report.append("| ---------------- | ----- | ---------- |\r\n");
-		for (String[] result: results) {
+		for (String[] result : results) {
 			report.append("| ");
 			report.append(result[0]);
 			report.append(" | ");
@@ -222,7 +205,7 @@ public class EventBusTest extends TestCase {
 		report.append("\".  \r\nThe best result is ");
 		report.append(results[0][2].trim());
 		report.append(" messages per second.*\r\n");
-		
+
 		report.append("\r\nWarm up cycles: ");
 		report.append(formatter.format(WARM_UP_LOOPS));
 		report.append("  \r\nTest cycles:    ");
@@ -239,7 +222,7 @@ public class EventBusTest extends TestCase {
 		String formatted = formatter.format(eventsPerSecond);
 		while (formatted.length() < 10) {
 			formatted += ' ';
-		}		
+		}
 		while (frameworkName.length() < 16) {
 			frameworkName += ' ';
 		}
@@ -264,24 +247,6 @@ public class EventBusTest extends TestCase {
 		}
 		long duration = System.currentTimeMillis() - start;
 		assertEquals(checksum, moleculerService.counter.get());
-		return duration;
-	}
-
-	// --- SPEED TEST OF MOLECULER (ASYNC) ---
-
-	protected long doMoleculerTestAsync(int loops, long checksum) throws Exception {
-		moleculerServiceAsync.counter.set(0);
-		moleculerServiceAsync.future = new CompletableFuture<Void>();
-		moleculerServiceAsync.limit = checksum;
-
-		// Asynchronous transport
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < loops; i++) {
-			moleculerBrokerAsync.broadcast("test.event", new CheckedTree(i));
-		}
-		moleculerServiceAsync.future.get();
-		long duration = System.currentTimeMillis() - start;
-		assertEquals(checksum, moleculerServiceAsync.counter.get());
 		return duration;
 	}
 
@@ -363,9 +328,6 @@ public class EventBusTest extends TestCase {
 	protected void tearDown() throws Exception {
 		if (moleculerBroker != null) {
 			moleculerBroker.stop();
-		}
-		if (moleculerBrokerAsync != null) {
-			moleculerBrokerAsync.stop();
 		}
 		if (springContext != null) {
 			springContext.close();
